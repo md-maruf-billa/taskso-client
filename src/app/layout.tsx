@@ -10,7 +10,7 @@ const roboto = Roboto({
 });
 
 export const metadata: Metadata = {
-  title: "Taskso | Task management platform",
+  title: "Tasko | Task management platform",
   description: "Developed by - Md Abumahid Islam",
 };
 
