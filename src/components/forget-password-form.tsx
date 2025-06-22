@@ -6,6 +6,8 @@ import { Input } from './ui/input'
 import { FieldValues, SubmitHandler, useForm } from 'react-hook-form'
 import { cn } from '@/lib/utils'
 import Link from 'next/link'
+import { toast } from 'sonner'
+import { forget_password } from '@/server_actions/auth'
 
 export default function ForgetPasswordForm({
     className,
@@ -14,6 +16,7 @@ export default function ForgetPasswordForm({
     const {
         register,
         handleSubmit,
+        reset,
         formState: { errors },
     } = useForm({
         defaultValues: {
@@ -23,8 +26,15 @@ export default function ForgetPasswordForm({
 
     // handle login here
     const handle_forget: SubmitHandler<FieldValues> = async (data) => {
-        console.log(data)
-        // Add your login logic here (e.g., API call)
+        const id = toast.loading("Information checking.....")
+
+        const result = await forget_password(data?.email as string)
+        if (result?.success) {
+            toast.success(result?.message, { id })
+            reset()
+        } else {
+            toast.error(result?.message, { id })
+        }
     }
     return (
         <form

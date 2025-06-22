@@ -7,11 +7,15 @@ import { Label } from "@/components/ui/label"
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form"
 import Link from "next/link"
 import { useState } from "react"
+import { register_user } from "@/server_actions/auth"
+import { toast } from "sonner"
+import { useRouter } from "next/navigation"
 
 export function RegisterForm({
     className,
     ...props
 }: React.ComponentProps<"form">) {
+    const router = useRouter()
     const [passError, setPassError] = useState<string>("")
     const {
         register,
@@ -32,8 +36,19 @@ export function RegisterForm({
         if (data?.password !== data?.confirmPassword) {
             return setPassError("Confirm password not matched!")
         }
-        console.log(data)
-        // Add your login logic here (e.g., API call)
+        const id = toast.loading("Information checking.....")
+        const payload = {
+            name: data?.name,
+            email: data?.email,
+            password: data?.confirmPassword
+        }
+        const result = await register_user(payload)
+        if (result?.success) {
+            toast.success(result?.message, { id })
+            router.push("/")
+        } else {
+            toast.error(data?.message, { id })
+        }
     }
 
     return (

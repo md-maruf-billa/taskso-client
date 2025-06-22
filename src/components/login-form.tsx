@@ -6,11 +6,18 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form"
 import Link from "next/link"
+import { useState } from "react"
+import { login_user } from "@/server_actions/auth"
+import { useRouter } from "next/navigation"
+import { toast } from 'sonner'
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"form">) {
+  const [loading, setLoading] = useState<boolean>(false);
+  const [apiError, setApiError] = useState<string>()
+  const router = useRouter()
   const {
     register,
     handleSubmit,
@@ -24,8 +31,20 @@ export function LoginForm({
 
   // handle login here
   const handle_login: SubmitHandler<FieldValues> = async (data) => {
-    console.log(data)
-    // Add your login logic here (e.g., API call)
+    setLoading(true)
+    const payload = {
+      email: data?.email,
+      password: data?.password
+    }
+    const result = await login_user(payload)
+    if (result?.success) {
+      setLoading(false)
+      toast.success(result?.message)
+      router.push("/dashboard")
+    } else {
+      setApiError(result?.message)
+      setLoading(false)
+    }
   }
 
   return (
@@ -76,10 +95,13 @@ export function LoginForm({
           {errors.password && (
             <p className="text-sm text-destructive">{errors.password.message}</p>
           )}
+          {apiError && (
+            <p className="text-sm text-destructive">{apiError}</p>
+          )}
         </div>
 
-        <Button type="submit" className="w-full">
-          Login
+        <Button disabled={loading} type="submit" className="w-full">
+          {loading ? "Loging ...." : 'Login'}
         </Button>
 
         {/* Divider */}

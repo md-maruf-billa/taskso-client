@@ -1,6 +1,6 @@
 "use client"
 
-import { ClipboardList, LoaderPinwheel, LogOut, Settings, SquarePen } from "lucide-react"
+import { ClipboardList, LoaderPinwheel, LogOut } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
@@ -47,7 +47,7 @@ export default function NavBar() {
                             Task List
                         </Link>
                         <Link
-                            href="/spin"
+                            href="/dashboard/spin"
                             className={`flex items-center gap-1 transition-colors ${path.includes("/spin") ? "text-primary" : "text-white"
                                 }`}
                         >
@@ -68,8 +68,8 @@ export default function NavBar() {
                             <DropdownMenuContent>
                                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                                 <DropdownMenuSeparator />
-                                <DropdownMenuItem><SquarePen /> Edit Profile</DropdownMenuItem>
-                                <DropdownMenuItem><Settings /> Setting</DropdownMenuItem>
+                                {/* <DropdownMenuItem><SquarePen /> Edit Profile</DropdownMenuItem>
+                                <DropdownMenuItem><Settings /> Setting</DropdownMenuItem> */}
                                 <DropdownMenuItem className="bg-red-300"><LogOut /> Logout</DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>

@@ -113,7 +113,7 @@ export default function DashboardHomePage() {
     }, [selectedCategory, selectedStatus, data])
 
     return (
-        <div className="absolute w-full container top-[90px] left-1/2 transform -translate-x-1/2 p-4">
+        <div className="absolute w-full container top-[90px] left-1/2 transform -translate-x-1/2">
             <div>
                 <h2 className='text-2xl font-semibold text-primary'>Hi Thomas</h2>
                 <h1 className='text-[40px] font-semibold text-white'>Welcome to Dashboard</h1>

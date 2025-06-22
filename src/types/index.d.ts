@@ -9,3 +9,18 @@ export type TTask = {
     updatedAt: string,
     status: string
 }
+
+export type TLoginPayload = {
+    email: string,
+    password: string
+}
+export type TRegisterPayload = {
+    email: string,
+    password: string,
+    name: string
+}
+
+export type TResetPayload = {
+    token: string,
+    newPassword: string
+}
