@@ -173,11 +173,11 @@ export default function DashboardHomePage() {
                                 <div className='flex items-start gap-4'>
                                     <div>
                                         <div className='bg-primary rounded-full w-12 h-12 flex justify-center items-center'>
-                                            <ListChecks className="text-white" />
+                                            <ListChecks className="size-6" />
                                         </div>
                                     </div>
                                     <div>
-                                        <h1 className='text-2xl font-semibold'>{task.taskName}</h1>
+                                        <Link href={`/dashboard/task-details/${task?._id}`} className='text-2xl font-semibold'>{task.taskName}</Link>
                                         <p className="text-sm text-[#667085] mt-2 bg-gray-200 w-fit px-4 rounded-full">
                                             {task.category}
                                         </p>
