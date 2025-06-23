@@ -13,7 +13,7 @@ import { Button } from '@/components/ui/button'
 import { CalendarDays, Dot, FilePlus, ListChecks, Trash2 } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { categories } from '@/lib/constant'
+import { categories, modifiedDate } from '@/lib/constant'
 import { cn } from '@/lib/utils'
 import { delete_task, get_all_task } from '@/server_actions/task'
 import { TTask } from '@/types'
@@ -23,10 +23,10 @@ import { toast } from 'sonner'
 export default function DashboardHomePage() {
     const [selectedCategory, setSelectedCategory] = useState<string>('all')
     const [selectedStatus, setSelectedStatus] = useState<string>('all')
-    const modifiedDate = (isoDate: string) => new Date(isoDate).toDateString()
     const [openModal, setOpenModal] = useState<boolean>(false)
     const [loading, setLoading] = useState<boolean>(false)
     const [data, setData] = useState<TTask[]>([])
+    const [filteredData, setFilteredData] = useState(data)
     useEffect(() => {
         const fetchData = async () => {
             const result = await get_all_task()
@@ -34,7 +34,6 @@ export default function DashboardHomePage() {
         }
         fetchData()
     }, [openModal])
-    const [filteredData, setFilteredData] = useState(data)
 
     useEffect(() => {
         let tempData = data
@@ -65,20 +64,20 @@ export default function DashboardHomePage() {
     }
 
     return (
-        <div className="absolute w-full container top-[90px] left-1/2 transform -translate-x-1/2">
+        <div className="absolute w-full container top-[90px] left-1/2 transform -translate-x-1/2 px-2 lg:px-0">
             <div>
                 <h2 className='text-2xl font-semibold text-primary'>Hi Thomas</h2>
-                <h1 className='text-[40px] font-semibold text-white'>Welcome to Dashboard</h1>
+                <h1 className='text-3xl md:text-[40px] font-semibold text-white'>Welcome to Dashboard</h1>
             </div>
 
             <div className='bg-white rounded-2xl shadow-md p-8 mt-12'>
                 {/* Filters */}
-                <div className='flex justify-between items-center'>
+                <div className='flex flex-col lg:flex-row justify-between gap-5 lg:gap-0 items-center'>
                     <h2 className='text-2xl font-semibold'>All Task List</h2>
-                    <div className="flex items-center gap-5">
+                    <div className="flex items-center gap-2 lg:gap-5">
                         {/* Category Filter */}
                         <Select onValueChange={setSelectedCategory} defaultValue="all">
-                            <SelectTrigger className="w-[220px]">
+                            <SelectTrigger className="w-[100px] md:w-[220px]">
                                 <SelectValue placeholder="Select Task Category" />
                             </SelectTrigger>
                             <SelectContent>
@@ -95,7 +94,7 @@ export default function DashboardHomePage() {
 
                         {/* Status Filter */}
                         <Select onValueChange={setSelectedStatus} defaultValue="all">
-                            <SelectTrigger className="w-[220px]">
+                            <SelectTrigger className="w-[100px] md:w-[220px]">
                                 <SelectValue placeholder="Select Task Status" />
                             </SelectTrigger>
                             <SelectContent>
@@ -119,7 +118,7 @@ export default function DashboardHomePage() {
 
                 {/* Task List */}
                 {filteredData?.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-9 mt-16">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-9 mt-10 md:mt-16">
                         {filteredData.map(task => (
                             <div key={task._id} className='p-5 bg-white shadow-md rounded-xl border relative'>
                                 <div className='flex items-start gap-4'>
@@ -133,7 +132,7 @@ export default function DashboardHomePage() {
                                         <p className="text-sm text-[#667085] mt-2 bg-gray-200 w-fit px-4 rounded-full">
                                             {task.category}
                                         </p>
-                                        <p className="text-sm text-[#667085] mt-2">{task.description}</p>
+                                        <p className="text-sm text-[#667085] mt-2">{task.description?.slice(0, 200)}</p>
                                     </div>
                                 </div>
 

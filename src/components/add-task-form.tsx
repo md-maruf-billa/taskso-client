@@ -65,7 +65,7 @@ export default function AddTaskForm() {
             <form onSubmit={handleSubmit(onSubmit)}>
                 {/* Header */}
                 <div className="flex items-center justify-between">
-                    <h1 className="text-2xl font-semibold">Add Your New Task</h1>
+                    <h1 className="text-xl lg:text-2xl font-semibold">Add Your New Task</h1>
                     <Button type="submit">
                         <Save className="w-4 h-4 mr-2" />
                         Save Task
@@ -73,9 +73,9 @@ export default function AddTaskForm() {
                 </div>
 
                 {/* Main Form */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mt-10">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 mt-10">
                     {/* Left Side (2 cols) */}
-                    <div className="md:col-span-2 space-y-6">
+                    <div className="lg:col-span-2 space-y-6">
                         {/* Task Name */}
                         <div className="grid gap-2">
                             <Label htmlFor="taskName">Task Name</Label>

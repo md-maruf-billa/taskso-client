@@ -33,7 +33,7 @@ export default function NavBar() {
             className="h-[306px] bg-no-repeat bg-cover"
             style={{ backgroundImage: "url('/dashboard-banner.png')" }}
         >
-            <div className="container mx-auto">
+            <div className="container mx-auto px-2 lg:px-0">
                 <nav className="flex justify-between items-center py-4">
                     {/* nav start */}
                     <Link href={"/dashboard"} className="flex items-center gap-2">

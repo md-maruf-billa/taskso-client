@@ -83,10 +83,10 @@ export default function EditTaskForm({ task }: { task: TTask }) {
 
     return (
         <div className="bg-white rounded-2xl shadow-md p-10 max-w-5xl mx-auto">
-            <form onSubmit={handleSubmit(onSubmit)}>
+            <form onSubmit={handleSubmit(onSubmit)} >
                 {/* Header */}
                 <div className="flex items-center justify-between">
-                    <h1 className="text-2xl font-semibold">Update Your Task</h1>
+                    <h1 className="text-xl md:text-2xl font-semibold">Update Your Task</h1>
                     <Button type="submit">
                         <Save className="w-4 h-4 mr-2" />
                         Update Task
@@ -94,8 +94,8 @@ export default function EditTaskForm({ task }: { task: TTask }) {
                 </div>
 
                 {/* Form Fields */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mt-10">
-                    <div className="md:col-span-2 space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 mt-10">
+                    <div className="lg:col-span-2 space-y-3 md:space-y-6">
                         {/* Task Name */}
                         <div className="grid gap-2">
                             <Label htmlFor="taskName">Task Name</Label>

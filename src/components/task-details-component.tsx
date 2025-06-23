@@ -19,6 +19,7 @@ import Image from 'next/image'
 import { change_task_status, delete_task } from '@/server_actions/task'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
+import { modifiedDate } from '@/lib/constant'
 
 export default function TaskDetailsComponent({ task }: { task: TTask }) {
     const [openModal, setOpenModal] = useState<boolean>(false)
@@ -50,7 +51,7 @@ export default function TaskDetailsComponent({ task }: { task: TTask }) {
 
     return (
         <div className='bg-white rounded-2xl shadow-md p-10 mx-auto'>
-            <div className='flex justify-between items-center'>
+            <div className='flex flex-col md:flex-row justify-between items-center gap-5 md:gap-0'>
                 <h1 className='text-2xl font-semibold'>Task Details</h1>
                 <div className='flex items-center gap-6'>
                     <Dialog onOpenChange={setOpenModal} open={openModal}>
@@ -84,33 +85,33 @@ export default function TaskDetailsComponent({ task }: { task: TTask }) {
                 </div>
             </div>
             <hr className='my-8' />
-            <div className='flex items-start gap-4'>
+            <div className='flex flex-col md:flex-row items-start gap-4'>
                 <div>
-                    <div className='bg-primary rounded-full w-1 6 h-16 flex justify-center items-center'>
-                        <ListChecks className="size-10" />
+                    <div className='bg-primary rounded-full size-8 md:size-16 flex justify-center items-center'>
+                        <ListChecks className="size-5 md:size-10" />
                     </div>
                 </div>
 
                 <div>
                     <div>
-                        <h1 className='text-3xl font-semibold'>{task?.taskName}</h1>
-                        <p className='text-[#667085] mt-2 font-light'>{task?.description}</p>
+                        <h1 className='text-xl md:text-3xl font-semibold'>{task?.taskName}</h1>
+                        <p className='text-[#667085] text-sm md:text-base mt-2 font-light'>{task?.description}</p>
                     </div>
 
-                    <div className='mt-16 flex items-center gap-9'>
+                    <div className='mt-16 flex items-center gap-4 lg:gap-9'>
                         <div>
                             <p className='text-sm'>End Date</p>
                             <div className='flex items-center gap-2 text-gray-700'>
                                 <CalendarDays className="w-4 h-4" />
-                                <p>{task?.dueDate}</p>
+                                <p>{modifiedDate(task?.dueDate)}</p>
                             </div>
                         </div>
                         <div className='h-20 border'></div>
                         <div className={cn(
-                            "flex items-center font-semibold text-3xl",
-                            task.status === "Done" && "text-primary",
-                            task.status === "Ongoing" && "text-yellow-500",
-                            task.status === "Pending" && "text-pink-500"
+                            "flex items-center font-semibold text-xl md:text-3xl",
+                            task?.status === "Done" && "text-primary",
+                            task?.status === "Ongoing" && "text-yellow-500",
+                            task?.status === "Pending" && "text-pink-500"
                         )}>
                             <Dot className="size-16" />
                             <p>{task.status}</p>
