@@ -16,21 +16,36 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog"
 import Image from 'next/image'
+import { change_task_status, delete_task } from '@/server_actions/task'
+import { toast } from 'sonner'
+import { useRouter } from 'next/navigation'
 
 export default function TaskDetailsComponent({ task }: { task: TTask }) {
     const [openModal, setOpenModal] = useState<boolean>(false)
     const [openModal1, setOpenModal1] = useState<boolean>(false)
     const [loading, setLoading] = useState<boolean>(false)
+    const router = useRouter()
 
-    const handleDelete = () => {
+    const handleDelete = async () => {
         setLoading(true)
-
+        const res = await delete_task(task?._id)
+        if (res?.success) {
+            toast.success(res?.message)
+            router.push("/dashboard")
+        } else {
+            toast.error(res?.message)
+        }
         setOpenModal(false)
         setLoading(false)
     }
 
-    const handleStatusUpdate = (status: string) => {
-        setOpenModal1(true)
+    const handleStatusUpdate = async (status: string) => {
+        const res = await change_task_status(task?._id, status);
+        if (res?.success) {
+            setOpenModal1(true)
+        } else {
+            toast.error(res?.message)
+        }
     }
 
     return (
@@ -38,7 +53,33 @@ export default function TaskDetailsComponent({ task }: { task: TTask }) {
             <div className='flex justify-between items-center'>
                 <h1 className='text-2xl font-semibold'>Task Details</h1>
                 <div className='flex items-center gap-6'>
-                    <Button className='bg-[#FFAB001A] text-[#FFAB00] hover:bg-amber-300 hover:text-white'><PencilLine /> Edit Task</Button>
+                    <Dialog onOpenChange={setOpenModal} open={openModal}>
+                        <DialogTrigger asChild>
+                            <Button className='bg-[#ffe4de] hover:bg-[#f3c8be] text-[#FF4C24]'><Trash2 /> Delete Task</Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                            <DialogHeader>
+                                <DialogDescription className='flex flex-col justify-center items-center gap-4'>
+                                    <Image
+                                        src={"/delete.png"}
+                                        width={800}
+                                        height={800}
+                                        alt='delete modal'
+                                        className='max-w-sm h-full'
+                                    />
+                                    <div className="text-center">
+                                        <h1 className='text-[40px] font-semibold'>Are you Sure!!</h1>
+                                        <p>Do you want to delete this Task on this app?</p>
+                                    </div>
+                                    <div className='flex items-center gap-5'>
+                                        <Button onClick={handleDelete} className='px-10 py-5'>{loading ? "Deleting...." : "Yes"}</Button>
+                                        <Button onClick={() => setOpenModal(false)} className='px-10 py-5 bg-[#FF4C2426] hover:bg-[#ff4c2480] text-[#FF4C24]' >No</Button>
+                                    </div>
+                                </DialogDescription>
+                            </DialogHeader>
+                        </DialogContent>
+                    </Dialog>
+                    <Link href={`/dashboard/task-details/edit/${task?._id}`}><Button className='bg-[#FFAB001A] text-[#FFAB00] hover:bg-amber-300 hover:text-white'><PencilLine /> Edit Task</Button></Link>
                     <Link href={"/dashboard"}> <Button ><ArrowLeftToLine /> Back</Button></Link>
                 </div>
             </div>
@@ -89,35 +130,6 @@ export default function TaskDetailsComponent({ task }: { task: TTask }) {
                                 </SelectGroup>
                             </SelectContent>
                         </Select>
-                    </div>
-
-                    <div className='mt-20 flex justify-end'>
-                        <Dialog onOpenChange={setOpenModal} open={openModal}>
-                            <DialogTrigger asChild>
-                                <Button className='bg-[#ffe4de] hover:bg-[#f3c8be] text-[#FF4C24]'><Trash2 /> Delete Task</Button>
-                            </DialogTrigger>
-                            <DialogContent>
-                                <DialogHeader>
-                                    <DialogDescription className='flex flex-col justify-center items-center gap-4'>
-                                        <Image
-                                            src={"/delete.png"}
-                                            width={800}
-                                            height={800}
-                                            alt='delete modal'
-                                            className='max-w-sm h-full'
-                                        />
-                                        <div className="text-center">
-                                            <h1 className='text-[40px] font-semibold'>Are you Sure!!</h1>
-                                            <p>Do you want to delete this Task on this app?</p>
-                                        </div>
-                                        <div className='flex items-center gap-5'>
-                                            <Button onClick={handleDelete} className='px-10 py-5'>{loading ? "Deleting...." : "Yes"}</Button>
-                                            <Button onClick={() => setOpenModal(false)} className='px-10 py-5 bg-[#FF4C2426] hover:bg-[#ff4c2480] text-[#FF4C24]' >No</Button>
-                                        </div>
-                                    </DialogDescription>
-                                </DialogHeader>
-                            </DialogContent>
-                        </Dialog>
                     </div>
 
 

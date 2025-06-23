@@ -3,7 +3,7 @@
 import { ClipboardList, LoaderPinwheel, LogOut } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -13,10 +13,21 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
+import { log_out_user } from "@/server_actions/auth"
+import { toast } from "sonner"
 
 export default function NavBar() {
     const path = usePathname()
-
+    const router = useRouter()
+    const handle_logOut = async () => {
+        const res = await log_out_user()
+        if (res) {
+            toast.success("Logout successful.")
+            router.push("/")
+        } else {
+            toast.error("Something went wrong!!")
+        }
+    }
     return (
         <div
             className="h-[306px] bg-no-repeat bg-cover"
@@ -70,7 +81,7 @@ export default function NavBar() {
                                 <DropdownMenuSeparator />
                                 {/* <DropdownMenuItem><SquarePen /> Edit Profile</DropdownMenuItem>
                                 <DropdownMenuItem><Settings /> Setting</DropdownMenuItem> */}
-                                <DropdownMenuItem className="bg-red-300"><LogOut /> Logout</DropdownMenuItem>
+                                <DropdownMenuItem onClick={handle_logOut} className="bg-red-300"><LogOut /> Logout</DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>

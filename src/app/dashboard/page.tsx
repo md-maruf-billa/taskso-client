@@ -15,85 +15,25 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { categories } from '@/lib/constant'
 import { cn } from '@/lib/utils'
+import { delete_task, get_all_task } from '@/server_actions/task'
+import { TTask } from '@/types'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTrigger } from '@/components/ui/dialog'
+import { toast } from 'sonner'
 
 export default function DashboardHomePage() {
     const [selectedCategory, setSelectedCategory] = useState<string>('all')
     const [selectedStatus, setSelectedStatus] = useState<string>('all')
-    const [data] = useState([
-        {
-            _id: 1,
-            taskName: "Design A Website",
-            category: "Arts and Craft",
-            description: "Select the role that you want to candidates for and upload your job description.",
-            dueDate: "Friday, April 19 - 2024",
-            status: "Pending"
-        },
-        {
-            _id: 2,
-            taskName: "Develop App",
-            category: "Arts and Craft",
-            description: "Build the front-end of the new application.",
-            dueDate: "Monday, May 13 - 2024",
-            status: "Ongoing"
-        },
-        {
-            _id: 3,
-            taskName: "Campaign Planning",
-            category: "Arts and Craft",
-            description: "Plan upcoming campaign for summer season.",
-            dueDate: "Wednesday, June 5 - 2024",
-            status: "Done"
-        },
-        {
-            _id: 4,
-            taskName: "Campaign Planning",
-            category: "Arts and Craft",
-            description: "Plan upcoming campaign for summer season.",
-            dueDate: "Wednesday, June 5 - 2024",
-            status: "Done"
-        },
-        {
-            _id: 5,
-            taskName: "Campaign Planning",
-            category: "Family",
-            description: "Plan upcoming campaign for summer season.",
-            dueDate: "Wednesday, June 5 - 2024",
-            status: "Done"
-        },
-        {
-            _id: 6,
-            taskName: "Campaign Planning",
-            category: "Marketing",
-            description: "Plan upcoming campaign for summer season.",
-            dueDate: "Wednesday, June 5 - 2024",
-            status: "Done"
-        },
-        {
-            _id: 7,
-            taskName: "Campaign Planning",
-            category: "Marketing",
-            description: "Plan upcoming campaign for summer season.",
-            dueDate: "Wednesday, June 5 - 2024",
-            status: "Done"
-        },
-        {
-            _id: 8,
-            taskName: "Campaign Planning",
-            category: "Marketing",
-            description: "Plan upcoming campaign for summer season.",
-            dueDate: "Wednesday, June 5 - 2024",
-            status: "Done"
-        },
-        {
-            _id: 9,
-            taskName: "Campaign Planning",
-            category: "Marketing",
-            description: "Plan upcoming campaign for summer season.",
-            dueDate: "Wednesday, June 5 - 2024",
-            status: "Done"
-        },
-    ])
-
+    const modifiedDate = (isoDate: string) => new Date(isoDate).toDateString()
+    const [openModal, setOpenModal] = useState<boolean>(false)
+    const [loading, setLoading] = useState<boolean>(false)
+    const [data, setData] = useState<TTask[]>([])
+    useEffect(() => {
+        const fetchData = async () => {
+            const result = await get_all_task()
+            setData(result?.data)
+        }
+        fetchData()
+    }, [openModal])
     const [filteredData, setFilteredData] = useState(data)
 
     useEffect(() => {
@@ -111,6 +51,18 @@ export default function DashboardHomePage() {
 
         setFilteredData(tempData)
     }, [selectedCategory, selectedStatus, data])
+
+    const handleDelete = async (taskId: string) => {
+        setLoading(true)
+        const res = await delete_task(taskId)
+        if (res?.success) {
+            toast.success(res?.message)
+        } else {
+            toast.error(res?.message)
+        }
+        setOpenModal(false)
+        setLoading(false)
+    }
 
     return (
         <div className="absolute w-full container top-[90px] left-1/2 transform -translate-x-1/2">
@@ -177,7 +129,7 @@ export default function DashboardHomePage() {
                                         </div>
                                     </div>
                                     <div>
-                                        <Link href={`/dashboard/task-details/${task?._id}`} className='text-2xl font-semibold'>{task.taskName}</Link>
+                                        <Link href={`/dashboard/task-details/${task?._id}`} className='text-2xl font-semibold hover:text-primary cursor-pointer'>{task.taskName}</Link>
                                         <p className="text-sm text-[#667085] mt-2 bg-gray-200 w-fit px-4 rounded-full">
                                             {task.category}
                                         </p>
@@ -188,7 +140,7 @@ export default function DashboardHomePage() {
                                 <div className="flex justify-between mt-7">
                                     <div className="flex items-center gap-2 text-gray-700">
                                         <CalendarDays className="w-4 h-4" />
-                                        <p>{task.dueDate}</p>
+                                        <p>{modifiedDate(task.dueDate)}</p>
                                     </div>
                                     <div className={cn(
                                         "flex items-center font-medium",
@@ -201,9 +153,34 @@ export default function DashboardHomePage() {
                                     </div>
                                 </div>
 
-                                <button className="text-red-600 absolute top-5 right-5 cursor-pointer">
-                                    <Trash2 />
-                                </button>
+                                <div className="text-red-600 absolute top-5 right-5 cursor-pointer">
+                                    <Dialog onOpenChange={setOpenModal} open={openModal}>
+                                        <DialogTrigger asChild>
+                                            <button className='text-[#FF4C24]'><Trash2 /></button>
+                                        </DialogTrigger>
+                                        <DialogContent>
+                                            <DialogHeader>
+                                                <DialogDescription className='flex flex-col justify-center items-center gap-4'>
+                                                    <Image
+                                                        src={"/delete.png"}
+                                                        width={800}
+                                                        height={800}
+                                                        alt='delete modal'
+                                                        className='max-w-sm h-full'
+                                                    />
+                                                    <div className="text-center">
+                                                        <h1 className='text-[40px] font-semibold'>Are you Sure!!</h1>
+                                                        <p>Do you want to delete this Task on this app?</p>
+                                                    </div>
+                                                    <div className='flex items-center gap-5'>
+                                                        <Button onClick={() => handleDelete(task?._id)} className='px-10 py-5'>{loading ? "Deleting...." : "Yes"}</Button>
+                                                        <Button onClick={() => setOpenModal(false)} className='px-10 py-5 bg-[#FF4C2426] hover:bg-[#ff4c2480] text-[#FF4C24]' >No</Button>
+                                                    </div>
+                                                </DialogDescription>
+                                            </DialogHeader>
+                                        </DialogContent>
+                                    </Dialog>
+                                </div>
                             </div>
                         ))}
                     </div>

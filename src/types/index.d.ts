@@ -1,5 +1,5 @@
 export type TTask = {
-    _id: string | number,
+    _id: string,
     taskName: string,
     category: string,
     description: string,

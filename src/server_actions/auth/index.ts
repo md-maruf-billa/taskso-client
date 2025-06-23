@@ -54,3 +54,7 @@ export const reset_password = async (payload: TResetPayload) => {
     })
     return (await res.json())
 }
+export const log_out_user = async () => {
+    (await cookies()).delete("accessToken")
+    return true
+}

@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect } from 'react'
-import { FieldValues, SubmitHandler, useForm } from 'react-hook-form'
+import { useForm, SubmitHandler } from 'react-hook-form'
 import { Button } from './ui/button'
 import { Save } from 'lucide-react'
 import { Label } from './ui/label'
@@ -18,11 +18,20 @@ import {
 import { Calendar } from './ui/calendar'
 import { categories } from '@/lib/constant'
 import { toast } from 'sonner'
-import { create_new_task } from '@/server_actions/task'
+import { update_task } from '@/server_actions/task'
 import { useRouter } from 'next/navigation'
+import { TTask } from '@/types'
 
-export default function AddTaskForm() {
+type TTaskFormValues = {
+    taskName: string
+    category: string
+    description: string
+    dueDate: Date | null
+}
+
+export default function EditTaskForm({ task }: { task: TTask }) {
     const router = useRouter()
+
     const {
         register,
         handleSubmit,
@@ -31,16 +40,28 @@ export default function AddTaskForm() {
         watch,
         reset,
         formState: { errors },
-    } = useForm({
+    } = useForm<TTaskFormValues>({
         defaultValues: {
             taskName: '',
             category: '',
             description: '',
-            dueDate: undefined,
+            dueDate: null,
         },
     })
 
-    // Manually register 'category' and 'dueDate' since they are not native inputs
+    // Set default values from `task` prop
+    useEffect(() => {
+        if (task) {
+            reset({
+                taskName: task.taskName || '',
+                category: task.category || '',
+                description: task.description || '',
+                dueDate: task.dueDate ? new Date(task.dueDate) : null,
+            })
+        }
+    }, [task, reset])
+
+    // Manually register non-native inputs
     useEffect(() => {
         register('category', { required: 'Task category is required!' })
         register('dueDate', { required: 'Due date is required!' })
@@ -48,15 +69,15 @@ export default function AddTaskForm() {
 
     const selectedDate = watch('dueDate')
 
-    const onSubmit: SubmitHandler<FieldValues> = async (data) => {
+    const onSubmit: SubmitHandler<TTaskFormValues> = async (data) => {
         const id = toast.loading("Information checking.....")
-        const res = await create_new_task(data);
+        const res = await update_task(data, task?._id)
         if (res?.success) {
-            toast.success(res?.message, { id })
+            toast.success(res.message, { id })
             reset()
             router.push("/dashboard")
         } else {
-            toast.error(res?.message, { id })
+            toast.error(res.message, { id })
         }
     }
 
@@ -65,16 +86,15 @@ export default function AddTaskForm() {
             <form onSubmit={handleSubmit(onSubmit)}>
                 {/* Header */}
                 <div className="flex items-center justify-between">
-                    <h1 className="text-2xl font-semibold">Add Your New Task</h1>
+                    <h1 className="text-2xl font-semibold">Update Your Task</h1>
                     <Button type="submit">
                         <Save className="w-4 h-4 mr-2" />
-                        Save Task
+                        Update Task
                     </Button>
                 </div>
 
-                {/* Main Form */}
+                {/* Form Fields */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mt-10">
-                    {/* Left Side (2 cols) */}
                     <div className="md:col-span-2 space-y-6">
                         {/* Task Name */}
                         <div className="grid gap-2">
@@ -82,11 +102,11 @@ export default function AddTaskForm() {
                             <Input
                                 id="taskName"
                                 {...register('taskName', { required: 'Task name is required!' })}
-                                placeholder="Enter Your Task Name"
+                                placeholder="Enter your task name"
                             />
                             {errors.taskName && (
                                 <p className="text-sm text-destructive">
-                                    {errors.taskName.message as string}
+                                    {errors.taskName.message}
                                 </p>
                             )}
                         </div>
@@ -99,21 +119,24 @@ export default function AddTaskForm() {
                                     setValue('category', value, { shouldValidate: true })
                                     trigger('category')
                                 }}
+                                defaultValue={task?.category}
                             >
-                                <SelectTrigger className='w-full' id="category">
+                                <SelectTrigger id="category" className="w-full">
                                     <SelectValue placeholder="Select Task Category" />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectGroup>
-                                        {
-                                            categories?.map((category, idx) => <SelectItem key={idx} value={category}>{category}</SelectItem>)
-                                        }
+                                        {categories.map((category, idx) => (
+                                            <SelectItem key={idx} value={category}>
+                                                {category}
+                                            </SelectItem>
+                                        ))}
                                     </SelectGroup>
                                 </SelectContent>
                             </Select>
                             {errors.category && (
                                 <p className="text-sm text-destructive">
-                                    {errors.category.message as string}
+                                    {errors.category.message}
                                 </p>
                             )}
                         </div>
@@ -131,20 +154,20 @@ export default function AddTaskForm() {
                             />
                             {errors.description && (
                                 <p className="text-sm text-destructive">
-                                    {errors.description.message as string}
+                                    {errors.description.message}
                                 </p>
                             )}
                         </div>
                     </div>
 
-                    {/* Right Side - Date Picker */}
+                    {/* Right Side - Due Date */}
                     <div className="grid gap-3">
                         <Label>Select Due Date</Label>
                         <Calendar
                             mode="single"
-                            selected={selectedDate}
+                            selected={selectedDate ?? undefined}
                             onSelect={(date) => {
-                                setValue('dueDate', date as undefined, { shouldValidate: true })
+                                setValue('dueDate', date ?? null, { shouldValidate: true })
                                 trigger('dueDate')
                             }}
                             className="rounded-md border shadow-sm w-full"
@@ -152,7 +175,7 @@ export default function AddTaskForm() {
                         />
                         {errors.dueDate && (
                             <p className="text-sm text-destructive">
-                                {errors.dueDate.message as string}
+                                {errors.dueDate.message}
                             </p>
                         )}
                     </div>
